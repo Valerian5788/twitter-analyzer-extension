@@ -1,0 +1,10 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    width: 200px;
+}
+
+#results {
+    margin-top: 10px;
+}
