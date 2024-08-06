@@ -1,18 +1,14 @@
-// popup.js
-document.getElementById('analyzeButton').addEventListener('click', () => {
-    chrome.storage.local.get('analysis', (result) => {
-        if (result.analysis) {
-            displayResults(result.analysis);
-        }
+document.getElementById('viewTweets').addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'getTweetCount' }, (response) => {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `<p>Number of tweets seen: ${response.count}</p><p>Tweets:</p><ul>${response.tweets.map(tweet => `<li>${tweet}</li>`).join('')}</ul>`;
     });
-});
-
-function displayResults(data) {
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '';
-    for (const [category, count] of Object.entries(data)) {
-        const p = document.createElement('p');
-        p.textContent = `${category}: ${count}%`;
-        resultsDiv.appendChild(p);
-    }
-}
+  });
+  
+  document.getElementById('analyzeTweets').addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'analyzeTweets' }, (response) => {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `<p>Analysis Result:</p><ul>${response.result.map((res, index) => `<li>Tweet ${index + 1}: ${res}</li>`).join('')}</ul>`;
+    });
+  });
+  

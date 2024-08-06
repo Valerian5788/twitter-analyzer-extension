@@ -1,24 +1,23 @@
-// content.js
-let tweets = [];
+console.log('Content script loaded');
 
-function isTextTweet(tweetElement) {
-    // Vérifier s'il y a des images ou des vidéos
-    let media = tweetElement.querySelector('img, video');
-    return !media;
-}
-
-document.addEventListener('scroll', function() {
-    let tweetElements = document.querySelectorAll('article');
-    tweetElements.forEach(tweetElement => {
-        let tweetText = tweetElement.innerText;
-        if (!tweets.includes(tweetText) && isTextTweet(tweetElement)) {
-            tweets.push(tweetText);
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.addedNodes) {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) {
+          const tweetTextElement = node.querySelector('div[data-testid="tweetText"]');
+          if (tweetTextElement) {
+            const tweetText = tweetTextElement.innerText;
+            console.log('Tweet detected:', tweetText);  // Message de débogage
+            chrome.runtime.sendMessage({ action: 'addTweet', tweet: tweetText });
+          }
         }
-    });
+      });
+    }
+  });
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "getTweets") {
-        sendResponse({ tweets: tweets });
-    }
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
 });
